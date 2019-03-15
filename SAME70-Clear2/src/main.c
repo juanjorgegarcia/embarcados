@@ -13,6 +13,14 @@
  *  - Kit: ATMEL SAME70-XPLD - ARM CORTEX M7
  */
 
+/** 
+ ** Entrega realizada em parceria com:
+ **  - Pedro Azambuja
+ **  - Juan Jorge Garcia
+ ** 
+ **  - https://www.youtube.com/watch?v=ROb1iACliDI
+ **/
+
 /************************************************************************/
 /* includes                                                             */
 /************************************************************************/
@@ -59,6 +67,12 @@
 #define BUT3_PIO_ID        ID_PIOC                    // ID do periférico PIOC (controla LED)
 #define BUT3_PIO_IDX       13u                    // ID do LED no PIO
 #define BUT3_PIO_IDX_MASK  (1u << BUT3_PIO_IDX)   // Mascara para CONTROLARMOS o LED
+
+// BOTAO DE PAUSA
+#define BUT4_PIO           PIOB                  // periferico que controla o LED
+#define BUT4_PIO_ID        ID_PIOB                   // ID do periférico PIOC (controla LED)
+#define BUT4_PIO_IDX       3u                    // ID do LED no PIO
+#define BUT4_PIO_IDX_MASK  (1u << BUT4_PIO_IDX)   // Mascara para CONTROLARMOS o LED
 
 
 
@@ -131,7 +145,14 @@ void init(void)
 
 	pmc_enable_periph_clk(BUT_PIO_ID);
 	pmc_enable_periph_clk(BUT1_PIO_ID);
-	pio_set_input(BUT1_PIO, BUT_PIO_IDX_MASK,PIO_DEFAULT);
+	pmc_enable_periph_clk(BUT4_PIO_ID);
+
+
+
+	pio_set_input(BUT1_PIO, BUT1_PIO_IDX_MASK,PIO_DEFAULT);
+	pio_set_input(BUT4_PIO, BUT1_PIO_IDX_MASK,PIO_DEFAULT);
+
+
 	
 	//Inicializa Led 1 
 	pmc_enable_periph_clk(LED1_PIO_ID);
@@ -451,11 +472,15 @@ int duration3[] = {         //duration of each note (in ms) Quarter Note is set 
 };
 
 //int durations[][] = {duration1, duration2, duration3};
+volatile Bool para_musica = false;
 void tone(long noteFreq,long duration){
 	const int t = 1000000.0/(noteFreq*2.0);
 
 	for (int i = 0;i<(noteFreq*duration)/1000;i++)
 	{
+		if (!pio_get(BUT4_PIO,PIO_INPUT,BUT4_PIO_IDX_MASK)) {
+			para_musica = true;
+		}
 		
 		
 		pio_set(PIOA,BUZ_PIO_IDX_MASK);
@@ -469,6 +494,10 @@ void tone(long noteFreq,long duration){
 void playMusic(int notes[], int duration[],int songLen,float songspeed){
 
 	for(int i =0; i<songLen; i++){
+		if(para_musica) {
+			para_musica = false;
+			break;
+		}
 		
 		int wait = duration[i]*songspeed;
 			pio_clear(LED_PIO,LED_PIO_IDX_MASK);
@@ -509,6 +538,8 @@ int main(void)
 	const int but1 = !pio_get(BUT1_PIO,PIO_INPUT,BUT1_PIO_IDX_MASK);
 	const int but2 = !pio_get(BUT2_PIO,PIO_INPUT,BUT2_PIO_IDX_MASK);
 	const int but3 = !pio_get(BUT3_PIO,PIO_INPUT,BUT3_PIO_IDX_MASK);
+	const int but4 = !pio_get(BUT4_PIO,PIO_INPUT,BUT4_PIO_IDX_MASK);
+
 	const int but0 = !pio_get(BUT_PIO,PIO_INPUT,BUT_PIO_IDX_MASK);
 
 	
