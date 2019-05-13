@@ -19,6 +19,8 @@
  **  - Juan Jorge Garcia
  ** 
  **  - https://www.youtube.com/watch?v=ROb1iACliDI
+ **  - https://github.com/xitangg/-Pirates-of-the-Caribbean-Theme-Song/blob/master/Pirates_of_the_Caribbean_-_Theme_Song.ino
+ **  - https://www.hackster.io/joshi/piezo-christmas-songs-fd1ae9
  **/
 
 /************************************************************************/
